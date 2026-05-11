@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>Game Account Shop</title>
+
+<style>
+body {
+  margin:0;
+  font-family:Arial;
+  background:#0b0b0b;
+  color:white;
+}
+
+h1 {
+  text-align:center;
+  color:#00ffcc;
+  padding:20px;
+}
+
+.container {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+  padding:20px;
+}
+
+.card {
+  background:#1a1a1a;
+  padding:20px;
+  border-radius:10px;
+}
+
+.image {
+  height:150px;
+  background:black;
+  margin-bottom:10px;
+}
+
+button {
+  width:100%;
+  padding:10px;
+  background:#00ffcc;
+  border:none;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Game Account Store</h1>
+
+<div class="container" id="list"></div>
+
+<script>
+async function load(){
+  const res = await fetch("/api/accounts");
+  const data = await res.json();
+
+  document.getElementById("list").innerHTML =
+    data.map(item => `
+      <div class="card">
+        <div class="image"></div>
+        <h3>${item.name}</h3>
+        <p>$${item.price}</p>
+        <button onclick="buy(${item.id})">購買</button>
+      </div>
+    `).join("");
+}
+
+async function buy(id){
+  const res = await fetch("/api/buy", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ id })
+  });
+
+  const data = await res.json();
+
+  alert(
+    "購買成功!\n帳號:" + data.account +
+    "\n密碼:" + data.password
+  );
+}
+
+load();
+</script>
+
+</body>
+</html>
