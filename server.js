@@ -1,7 +1,26 @@
+//建立 DB 連線
+const mongoose = require("mongoose");
+
+mongoose.connect(process.env.MONGO_URL)
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.log(err));
+
 const express = require("express");
 const path = require("path");
 
 const app = express();
+
+//建立商品模型
+
+const accountSchema = new mongoose.Schema({
+  name: String,
+  price: Number,
+  account: String,
+  password: String,
+  status: { type: String, default: "available" }
+});
+
+const Account = mongoose.model("Account", accountSchema);
 
 // 讓 public 可以被讀取（前端）
 app.use(express.static("public"));
@@ -17,6 +36,12 @@ let accounts = [
 // 取得商品
 app.get("/api/accounts", (req, res) => {
   res.json(accounts);
+});
+
+//新稱商品(賣家)
+app.post("/api/add", async (req, res) => {
+  const item = await Account.create(req.body);
+  res.json(item);
 });
 
 // 模擬下單
